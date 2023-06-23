@@ -5,21 +5,21 @@ import exceptions.StorageIsFullException;
 
 import java.util.Arrays;
 
-public class StringListImpl implements StringList {
+public class IntegerListImpl implements IntegerList {
 
-    private final String[] storage;
+    private Integer[] storage;
     private int size;
 
-    public StringListImpl() {
-        storage = new String[10];
+    public IntegerListImpl() {
+        storage = new Integer[10];
     }
 
-    public StringListImpl(int size) {
-        storage = new String[size];
+    public IntegerListImpl(int size) {
+        storage = new Integer[size];
     }
 
     @Override
-    public String add(String item) {
+    public Integer add(Integer item) {
         validateSize();
         validateItem(item);
         storage[size++] = item;
@@ -27,7 +27,7 @@ public class StringListImpl implements StringList {
     }
 
     @Override
-    public String add(int index, String item) {
+    public Integer add(int index, Integer item) {
         validateSize();
         validateItem(item);
         validateIndex(index);
@@ -45,7 +45,7 @@ public class StringListImpl implements StringList {
     }
 
     @Override
-    public String set(int index, String item) {
+    public Integer set(int index, Integer item) {
         validateIndex(index);
         validateItem(item);
         storage[index] = item;
@@ -53,7 +53,7 @@ public class StringListImpl implements StringList {
     }
 
     @Override
-    public String remove(String item) {
+    public Integer remove(Integer item) {
         validateItem(item);
 
         int index = indexOf(item);
@@ -71,10 +71,10 @@ public class StringListImpl implements StringList {
     }
 
     @Override
-    public String remove(int index) {
+    public Integer remove(int index) {
         validateIndex(index);
 
-        String item = storage[index];
+        Integer item = storage[index];
 
         if(index != size){
             System.arraycopy(storage, index + 1, storage, index, size - index);
@@ -85,8 +85,8 @@ public class StringListImpl implements StringList {
     }
 
     @Override
-    public boolean contains(String item) {
-        for (String el: storage) {
+    public boolean contains(Integer item) {
+        for (Integer el: storage) {
             if(item.equals(el)){
                 return true;
             }
@@ -95,7 +95,7 @@ public class StringListImpl implements StringList {
     }
 
     @Override
-    public int indexOf(String item) {
+    public int indexOf(Integer item) {
         for (int i = 0; i < size; i++) {
             if(item.equals(storage[i])){
                 return i;
@@ -105,7 +105,7 @@ public class StringListImpl implements StringList {
     }
 
     @Override
-    public int lastIndexOf(String item) {
+    public int lastIndexOf(Integer item) {
         for (int i = size - 1; i >= 0; i--) {
             if(item.equals(storage[i])){
                 return i;
@@ -115,15 +115,17 @@ public class StringListImpl implements StringList {
     }
 
     @Override
-    public String get(int index) {
+    public Integer get(int index) {
         validateIndex(index);
         return storage[index];
     }
 
     @Override
-    public boolean equals(StringList otherList) {
-       validateItem(otherList.toString());
-       return Arrays.equals(this.toArray(), otherList.toArray());
+    public boolean equals(IntegerList otherList) {
+        for (int i = 0; i < storage.length; i ++) {
+            validateItem(otherList.get(i));
+        }
+        return Arrays.equals(this.toArray(), otherList.toArray());
     }
 
     @Override
@@ -142,19 +144,24 @@ public class StringListImpl implements StringList {
     }
 
     @Override
-    public String[] toArray() {
+    public Integer[] toArray() {
         return Arrays.copyOf(storage, size);
     }
 
-    private void validateItem (String item){
+    private void validateItem (Integer item){
         if(item == null){
             throw new NullItemException();
         }
     }
-
+    /**проверяем длину массива и если массив заполнен,
+     * то увеличиваем его размер на заданную величину*/
     private void validateSize(){
         if(size == storage.length){
-            throw new StorageIsFullException();
+//            throw new StorageIsFullException();
+            int newSize = storage.length + 5;
+            Integer[] newStorage = new Integer[newSize];
+            System.arraycopy(storage, 0, newStorage, 0, storage.length);
+            storage = newStorage;
         }
     }
 
@@ -167,11 +174,15 @@ public class StringListImpl implements StringList {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("");
-        for (String el : storage) {
+        for (Integer el : storage) {
             if (el != null) {
                 sb.append(el + " ");
             }
         }
         return sb.toString();
+    }
+
+    public Integer[] getArray() {
+        return storage;
     }
 }
