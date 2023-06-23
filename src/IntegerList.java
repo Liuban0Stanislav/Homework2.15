@@ -1,4 +1,5 @@
 public interface IntegerList {
+
     // Добавление элемента.
     // Вернуть добавленный элемент
     // в качестве результата выполнения.
@@ -36,8 +37,7 @@ public interface IntegerList {
 
     // Проверка на существование элемента.
     // Вернуть true/false;
-    boolean contains(Integer item);
-
+    boolean contains(Integer item, String Inspection_Selection_Bubbles);
     // Поиск элемента.
     // Вернуть индекс элемента
     // или -1 в случае отсутствия.
@@ -74,4 +74,8 @@ public interface IntegerList {
     // из строк в списке
     // и вернуть его.
     Integer[] toArray();
+
+    public IntegerList integerListCopy(IntegerList list);
+
+    Integer[] getStorage();
 }

@@ -1,7 +1,6 @@
 import exceptions.ElementNotFoundException;
 import exceptions.InvalidIndexException;
 import exceptions.NullItemException;
-import exceptions.StorageIsFullException;
 
 import java.util.Arrays;
 
@@ -11,11 +10,91 @@ public class IntegerListImpl implements IntegerList {
     private int size;
 
     public IntegerListImpl() {
-        storage = new Integer[10];
+        storage = new Integer[100_000];
     }
 
     public IntegerListImpl(int size) {
         storage = new Integer[size];
+    }
+
+    @Override
+    public boolean contains(Integer item, String Inspection_Selection_Bubbles) {
+        switch (Inspection_Selection_Bubbles) {
+            case "Inspection":
+                sortInsertion(storage);
+                break;
+            case "Selection":
+                sortSelection(storage);
+                break;
+            case "Bubbles":
+                sortBubbles(storage);
+                break;
+        }
+
+        int min = 0;
+        int max = storage.length - 1;
+
+        while (min <= max) {
+            int mid = (min + max) / 2;
+
+            if (item == storage[mid]) {
+                return true;
+            }
+
+            if (item < storage[mid]) {
+                max = mid - 1;
+            } else {
+                min = mid + 1;
+            }
+        }
+        return false;
+
+//        for (Integer el : storage) {
+//            if (item.equals(el)) {
+//                return true;
+//            }
+//        }
+//        return false;
+    }
+
+    private static void sortInsertion(Integer[] arr) {
+        for (int i = 1; i < arr.length; i++) {
+            int temp = arr[i];
+            int j = i;
+            while (j > 0 && arr[j - 1] >= temp) {
+                arr[j] = arr[j - 1];
+                j--;
+            }
+            arr[j] = temp;
+        }
+    }
+
+    private void sortSelection(Integer[] arr) {
+        for (int i = 0; i < arr.length - 1; i++) {
+            int minElementIndex = i;
+            for (int j = i + 1; j < arr.length; j++) {
+                if (arr[j] < arr[minElementIndex]) {
+                    minElementIndex = j;
+                }
+            }
+            swapElements(arr, i, minElementIndex);
+        }
+    }
+
+    private void sortBubbles(Integer[] arr) {
+        for (int i = 0; i < arr.length - 1; i++) {
+            for (int j = 0; j < arr.length - 1 - i; j++) {
+                if (arr[j] > arr[j + 1]) {
+                    swapElements(arr, j, j + 1);
+                }
+            }
+        }
+    }
+
+    private static void swapElements(Integer[] arr, int indexA, int indexB) {
+        int tmp = arr[indexA];
+        arr[indexA] = arr[indexB];
+        arr[indexB] = tmp;
     }
 
     @Override
@@ -33,7 +112,7 @@ public class IntegerListImpl implements IntegerList {
         validateIndex(index);
 
 
-        if(index == size){
+        if (index == size) {
             storage[size++] = item;
             return item;
         }
@@ -58,11 +137,11 @@ public class IntegerListImpl implements IntegerList {
 
         int index = indexOf(item);
 
-        if(index == -1){
+        if (index == -1) {
             throw new ElementNotFoundException();
         }
 
-        if(index != size){
+        if (index != size) {
             System.arraycopy(storage, index + 1, storage, index, size - index);
         }
 
@@ -76,7 +155,7 @@ public class IntegerListImpl implements IntegerList {
 
         Integer item = storage[index];
 
-        if(index != size){
+        if (index != size) {
             System.arraycopy(storage, index + 1, storage, index, size - index);
         }
 
@@ -85,19 +164,9 @@ public class IntegerListImpl implements IntegerList {
     }
 
     @Override
-    public boolean contains(Integer item) {
-        for (Integer el: storage) {
-            if(item.equals(el)){
-                return true;
-            }
-        }
-        return false;
-    }
-
-    @Override
     public int indexOf(Integer item) {
         for (int i = 0; i < size; i++) {
-            if(item.equals(storage[i])){
+            if (item.equals(storage[i])) {
                 return i;
             }
         }
@@ -107,7 +176,7 @@ public class IntegerListImpl implements IntegerList {
     @Override
     public int lastIndexOf(Integer item) {
         for (int i = size - 1; i >= 0; i--) {
-            if(item.equals(storage[i])){
+            if (item.equals(storage[i])) {
                 return i;
             }
         }
@@ -122,7 +191,7 @@ public class IntegerListImpl implements IntegerList {
 
     @Override
     public boolean equals(IntegerList otherList) {
-        for (int i = 0; i < storage.length; i ++) {
+        for (int i = 0; i < storage.length; i++) {
             validateItem(otherList.get(i));
         }
         return Arrays.equals(this.toArray(), otherList.toArray());
@@ -148,15 +217,18 @@ public class IntegerListImpl implements IntegerList {
         return Arrays.copyOf(storage, size);
     }
 
-    private void validateItem (Integer item){
-        if(item == null){
+    public void validateItem(Integer item) {
+        if (item == null) {
             throw new NullItemException();
         }
     }
-    /**проверяем длину массива и если массив заполнен,
-     * то увеличиваем его размер на заданную величину*/
-    private void validateSize(){
-        if(size == storage.length){
+
+    /**
+     * проверяем длину массива и если массив заполнен,
+     * то увеличиваем его размер на заданную величину
+     */
+    private void validateSize() {
+        if (size == storage.length) {
 //            throw new StorageIsFullException();
             int newSize = storage.length + 5;
             Integer[] newStorage = new Integer[newSize];
@@ -165,8 +237,8 @@ public class IntegerListImpl implements IntegerList {
         }
     }
 
-    private void validateIndex(int index){
-        if(index < 0 || index > storage.length){
+    private void validateIndex(int index) {
+        if (index < 0 || index > storage.length) {
             throw new InvalidIndexException();
         }
     }
@@ -182,7 +254,14 @@ public class IntegerListImpl implements IntegerList {
         return sb.toString();
     }
 
-    public Integer[] getArray() {
+    public IntegerList integerListCopy(IntegerList list) {
+        IntegerList newIntegerList = new IntegerListImpl(100_001);
+        System.arraycopy(this.getStorage(), 0, list.getStorage(), 0, this.getStorage().length);
+        list = newIntegerList;
+        return list;
+    }
+
+    public Integer[] getStorage() {
         return storage;
     }
 }
